@@ -8,28 +8,40 @@ on:
 
 jobs:
   sanity:
-    name: Sanity (${{ matrix.ansible }} on ONTAP
-    runs-on: ubuntu-latest
+    name: Sanity (ansible-core ${{ matrix.ansible }} on ONTAP)
+    # Python 3.9 target checks need a setup-python build available on this LTS.
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         ansible:
-          - stable-2.16
-          - stable-2.17
-          - devel
+          - '2.21.6'
+          - '2.22.0'
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
-          # Ansible 2.16 requires 3.9 as a minimum
-          python-version: 3.11
+          # Preserve compile/import coverage for every supported target Python.
+          # The last entry remains the controller used to install ansible-core.
+          python-version: |
+            3.9
+            3.10
+            3.11
+            3.12
+            3.14
+            3.15
+            3.13
 
       - name: Install ansible (${{ matrix.ansible }})
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
+        run: python -m pip install 'ansible-core==${{ matrix.ansible }}' --disable-pip-version-check
 
       - name: Make directory to make ansible-test happy
         run: |
@@ -39,9 +51,9 @@ jobs:
 
 
       - name: Run sanity tests ONTAP
-        run: ansible-test sanity --docker -v --color
+        run: ansible-test sanity --local --requirements -v --color
         working-directory: ansible_collections/netapp/ontap/
 
       - name: Run Unit Tests
-        run: ansible-test units --docker -v --color --python 3.11
+        run: ansible-test units --local --requirements --num-workers 2 -v --color --python 3.13
         working-directory: ansible_collections/netapp/ontap/

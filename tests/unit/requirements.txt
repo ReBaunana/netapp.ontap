@@ -6,3 +6,4 @@ solidfire-sdk-python ; python_version >= '3.9'
 xmltodict ; python_version >= '3.9'
 deepdiff ; python_version >= '3.9'
 jmespath ; python_version >= '3.9'
+netapp-lib==2021.6.25
