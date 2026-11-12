@@ -9,7 +9,8 @@ on:
 jobs:
   sanity:
     name: Sanity (ansible-core ${{ matrix.ansible }} on ONTAP)
-    runs-on: ubuntu-latest
+    # Python 3.9 target checks need a setup-python build available on this LTS.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     strategy:
