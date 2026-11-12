@@ -23,6 +23,8 @@ def set_module_args(args):
     """prepare arguments so that they will be picked up during module creation"""
     args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
     basic._ANSIBLE_ARGS = to_bytes(args)  # pylint: disable=protected-access
+    if hasattr(basic, '_ANSIBLE_PROFILE'):
+        basic._ANSIBLE_PROFILE = 'legacy'  # pylint: disable=protected-access
 
 
 class AnsibleExitJson(Exception):
