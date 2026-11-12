@@ -34,7 +34,7 @@ jobs:
           rsync -av . ansible_collections/netapp/ontap/ --exclude ansible_collections/netapp/ontap/
 
       - name: Run Unit Tests
-        run: ansible-test units --coverage --color --docker --python 3.13
+        run: ansible-test units --coverage --color --local --requirements --num-workers 2 --python 3.13
         working-directory: ansible_collections/netapp/ontap/
 
         # ansible-test support producing code coverage date
